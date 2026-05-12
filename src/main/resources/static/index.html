@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User CRUD</title>
+</head>
+<body>
+
+<h1>Users</h1>
+
+<!-- CREATE -->
+<input type="text" id="name" placeholder="Enter name">
+<button onclick="addUser()">Add User</button>
+
+<br><br>
+
+<!-- READ -->
+<button onclick="loadUsers()">Load Users</button>
+
+<br><br>
+
+<!-- TABLE -->
+<table border="1" cellpadding="10">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+<script>
+
+    // LOAD USERS (READ)
+    async function loadUsers() {
+        const response = await fetch('/users');
+        const users = await response.json();
+
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+
+        users.forEach(user => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${user.id}</td>
+                <td>${user.name}</td>
+                <td>
+                    <button onclick="editUser(${user.id}, \`${user.name}\`)">Edit</button>
+                    <button onclick="deleteUser(${user.id})">Delete</button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    // CREATE
+    async function addUser() {
+        const nameInput = document.getElementById('name');
+        const name = nameInput.value;
+
+        if (!name) {
+            alert("Please enter a name");
+            return;
+        }
+
+        await fetch('/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
+
+        nameInput.value = '';
+        loadUsers();
+    }
+
+    // DELETE
+    async function deleteUser(id) {
+        await fetch(`/users/${id}`, {
+            method: 'DELETE'
+        });
+
+        loadUsers();
+    }
+
+    // EDIT (Prompt)
+    function editUser(id, oldName) {
+        const newName = prompt("Enter new name:", oldName);
+
+        if (newName && newName.trim() !== "") {
+            updateUser(id, newName);
+        }
+    }
+
+    // UPDATE
+    async function updateUser(id, name) {
+        await fetch(`/users/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
+
+        loadUsers();
+    }
+
+</script>
+
+</body>
+</html>

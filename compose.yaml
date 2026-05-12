@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+
+  postgres-dev:
+    image: postgres:16
+    container_name: postgres_dev
+    environment:
+      POSTGRES_DB: mydatabase_dev
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+
+  postgres-prod:
+    image: postgres:16
+    container_name: postgres_prod
+    environment:
+      POSTGRES_DB: mydatabase_prod
+      POSTGRES_USER: produser
+      POSTGRES_PASSWORD: prodpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-prod-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-dev-data:
+  postgres-prod-data:
